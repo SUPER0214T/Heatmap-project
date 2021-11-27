@@ -92,10 +92,23 @@ function Chart() {
 			localStorage.setItem('wakeUpDateTrack', JSON.stringify(copyDateArr));
 		}
 	};
+
+	function timeConverter(prevTime: number) {
+		let hours = Math.floor(prevTime);
+		let minutes = ((prevTime - hours) * 60).toFixed(0);
+		return `${hours < 10 ? `0${hours}` : hours} \: ${
+			Number(minutes) < 10 ? `0${minutes}` : minutes
+		}`;
+	}
+
 	/* 
-    1. 오늘 일어난 시간 수정하기
-    2. 60분을 1비율로 바꾸기
+    1. 오늘 일어난 시간 수정하기 v
+    2. 60분을 1비율로 바꾸기 v
     3. 제출 눌렀는데 아무것도 없으면 시간 선택하라고 register에 messagge custom 작성하기
+    4. 월 별로 나타내기 -> React-Router 사용해서 각 페이지 나눌 것임 -> 이것도 new Date로 month가져와서 페이지 나누면 됨
+    5. 잠이 든 시간도 나타낼 것임
+
+    6. formatter로 그래프 hover했을 때 tooltip 나타나는거 시간으로 바꾸기 -> formatter이용
   */
 
 	return (
@@ -176,6 +189,13 @@ function Chart() {
 						floating: true,
 						offsetY: -25,
 						offsetX: -5,
+					},
+					tooltip: {
+						y: {
+							formatter: (value) => {
+								return timeConverter(value);
+							}, // 들어온 값(8.5)을 8:30으로 바꾸는 함수 호출
+						},
 					},
 				}}
 			/>
