@@ -10,6 +10,11 @@ const Title = styled.div`
 	text-align: center;
 `;
 
+const ChartWrapper = styled.div`
+	max-width: 1200px;
+	margin: 0 auto;
+`;
+
 const DeleteButton = styled.button`
 	cursor: pointer;
 	background-color: tomato;
@@ -127,78 +132,88 @@ function Chart() {
 			<DeleteButton onClick={deleteToday} type="button">
 				오늘 일어난 시간 삭제하기
 			</DeleteButton>
-			<ApexChart
-				type="line"
-				series={[
-					{
-						name: '일어난 시간',
-						data: wakeUpTime,
-					},
-				]}
-				options={{
-					chart: {
-						height: 350,
-						type: 'line',
-						dropShadow: {
+			<ChartWrapper>
+				<ApexChart
+					type="line"
+					series={[
+						{
+							name: '일어난 시간',
+							data: wakeUpTime,
+						},
+					]}
+					options={{
+						chart: {
+							height: 350,
+							type: 'line',
+							dropShadow: {
+								enabled: true,
+								color: '#000',
+								top: 18,
+								left: 7,
+								blur: 10,
+								opacity: 0.2,
+							},
+							toolbar: {
+								show: false,
+							},
+						},
+						colors: ['#0c9df1', '#545454'],
+						dataLabels: {
 							enabled: true,
-							color: '#000',
-							top: 18,
-							left: 7,
-							blur: 10,
-							opacity: 0.2,
-						},
-						toolbar: {
-							show: false,
-						},
-					},
-					colors: ['#0c9df1', '#545454'],
-					dataLabels: {
-						enabled: true,
-					},
-					stroke: {
-						curve: 'smooth',
-					},
-					title: {
-						text: '일어난 시간 그래프',
-						align: 'left',
-					},
-					grid: {
-						borderColor: '#e7e7e7',
-						row: {
-							colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-							opacity: 0.5,
-						},
-					},
-					markers: {
-						size: 1,
-					},
-					xaxis: {
-						categories: dateArr,
-						title: {
-							text: '날짜',
-						},
-					},
-					yaxis: {
-						tickAmount: 6,
-						min: 0,
-						max: 24,
-					},
-					legend: {
-						position: 'top',
-						horizontalAlign: 'right',
-						floating: true,
-						offsetY: -25,
-						offsetX: -5,
-					},
-					tooltip: {
-						y: {
 							formatter: (value) => {
-								return timeConverter(value);
-							}, // 들어온 값(8.5)을 8:30으로 바꾸는 함수 호출
+								return timeConverter(value as number);
+							},
 						},
-					},
-				}}
-			/>
+						stroke: {
+							curve: 'smooth',
+						},
+						title: {
+							text: '일어난 시간 그래프',
+							align: 'left',
+						},
+						grid: {
+							borderColor: '#e7e7e7',
+							row: {
+								colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+								opacity: 0.5,
+							},
+						},
+						markers: {
+							size: 1,
+						},
+						xaxis: {
+							categories: dateArr,
+							title: {
+								text: '날짜',
+							},
+						},
+						yaxis: {
+							tickAmount: 7,
+							min: 0,
+							max: 14,
+							labels: {
+								formatter: (value) => {
+									return timeConverter(value);
+								},
+							},
+						},
+						legend: {
+							position: 'top',
+							horizontalAlign: 'right',
+							floating: true,
+							offsetY: -25,
+							offsetX: -5,
+						},
+						tooltip: {
+							y: {
+								formatter: (value) => {
+									return timeConverter(value);
+								},
+							},
+						},
+					}}
+				/>
+			</ChartWrapper>
 		</>
 	);
 }
