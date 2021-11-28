@@ -3,6 +3,7 @@ import ApexChart from 'react-apexcharts';
 import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import {
+	averageTime,
 	ChartWrapper,
 	Container,
 	DeleteButton,
@@ -24,7 +25,6 @@ function Chart() {
 	const { register, handleSubmit, setValue } = useForm();
 	let date = new Date();
 	const todayDate = date.getDate();
-
 	// 일어난 시간 설정
 	const onValid = ({ wakeUpInput }: ISubmitProps) => {
 		const stringTimeSplit = wakeUpInput
@@ -115,6 +115,7 @@ function Chart() {
 					<DeleteButton onClick={deleteToday} type="button">
 						오늘 기상 시간 삭제하기
 					</DeleteButton>
+					<div>평균 기상 시간: {averageTime(wakeUpTime)}</div>
 				</FormWrapper>
 				<ChartWrapper>
 					<ApexChart

@@ -52,3 +52,27 @@ export const DeleteButton = styled.button`
 	border-radius: 5px;
 	padding: 5px;
 `;
+
+export function averageTime(timeArray: string[]) {
+	let allTimes = 0;
+	timeArray.map((time) => Number(time)).map((time) => (allTimes += time));
+	const average = allTimes / timeArray.length;
+
+	let hours = Math.floor(average);
+	let minutes = ((average - hours) * 60).toFixed(0);
+	return `${hours < 10 ? `0${hours}` : hours}\:${
+		Number(minutes) < 10 ? `0${minutes}` : minutes
+	}`;
+}
+
+export function sleepAverageTime(timeArray: string[]) {
+	let allTimes = 0;
+	timeArray.map((time) => Number(time)).map((time) => (allTimes += time));
+	const average = allTimes / timeArray.length;
+
+	let hours = Math.floor(average);
+	let minutes = ((average - hours) * 60).toFixed(0);
+	return `${hours >= 24 ? `0${hours - 24}` : hours}\:${
+		Number(minutes) < 10 ? `0${minutes}` : minutes
+	}`;
+}

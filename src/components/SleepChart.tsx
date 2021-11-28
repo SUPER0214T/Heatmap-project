@@ -7,6 +7,7 @@ import {
 	Container,
 	DeleteButton,
 	FormWrapper,
+	sleepAverageTime,
 	Title,
 } from '../styles/chart-style';
 
@@ -122,6 +123,7 @@ function SleepChart() {
 					<DeleteButton onClick={deleteToday} type="button">
 						오늘 취침 시간 삭제하기
 					</DeleteButton>
+					<div>평균 취침 시간: {sleepAverageTime(sleepTime)}</div>
 				</FormWrapper>
 				<ChartWrapper>
 					<ApexChart
