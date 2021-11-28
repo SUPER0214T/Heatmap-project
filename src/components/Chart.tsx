@@ -2,27 +2,13 @@ import React, { useEffect, useState } from 'react';
 import ApexChart from 'react-apexcharts';
 import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
-
-const Title = styled.div`
-	padding: 10px;
-	font-size: 2rem;
-	font-weight: bold;
-	text-align: center;
-`;
-
-const ChartWrapper = styled.div`
-	max-width: 1200px;
-	margin: 0 auto;
-`;
-
-const DeleteButton = styled.button`
-	cursor: pointer;
-	background-color: tomato;
-	color: white;
-	font-weight: bold;
-	border-radius: 5px;
-	padding: 5px;
-`;
+import {
+	ChartWrapper,
+	Container,
+	DeleteButton,
+	FormWrapper,
+	Title,
+} from '../styles/chart-style';
 
 interface ISubmitProps {
 	wakeUpInput: string;
@@ -101,119 +87,144 @@ function Chart() {
 	function timeConverter(prevTime: number) {
 		let hours = Math.floor(prevTime);
 		let minutes = ((prevTime - hours) * 60).toFixed(0);
-		return `${hours < 10 ? `0${hours}` : hours} \: ${
+		return `${hours < 10 ? `0${hours}` : hours}\:${
 			Number(minutes) < 10 ? `0${minutes}` : minutes
 		}`;
 	}
 
-	/* 
-    1. 오늘 일어난 시간 수정하기 v
-    2. 60분을 1비율로 바꾸기 v
-    3. 제출 눌렀는데 아무것도 없으면 시간 선택하라고 register에 messagge custom 작성하기
-    4. 월 별로 나타내기 -> React-Router 사용해서 각 페이지 나눌 것임 -> 이것도 new Date로 month가져와서 페이지 나누면 됨
-    5. 잠이 든 시간도 나타낼 것임
-
-    6. formatter로 그래프 hover했을 때 tooltip 나타나는거 시간으로 바꾸기 -> formatter이용
-  */
-
 	return (
 		<>
-			<Title>Chart Page</Title>
-			<form onSubmit={handleSubmit(onValid)}>
-				<input
-					{...register('wakeUpInput', { required: true })}
-					autoComplete="off"
-					type="time"
-					id="wakeUp"
-				/>
-				<label htmlFor="wakeUp">시간 입력하기</label>
-				<button>제출</button>
-			</form>
-			<DeleteButton onClick={deleteToday} type="button">
-				오늘 일어난 시간 삭제하기
-			</DeleteButton>
-			<ChartWrapper>
-				<ApexChart
-					type="line"
-					series={[
-						{
-							name: '일어난 시간',
-							data: wakeUpTime,
-						},
-					]}
-					options={{
-						chart: {
-							height: 350,
-							type: 'line',
-							dropShadow: {
-								enabled: true,
-								color: '#000',
-								top: 18,
-								left: 7,
-								blur: 10,
-								opacity: 0.2,
+			<Title>
+				기상 시간 그래프
+				{`(${date.getFullYear() + ' - ' + (date.getMonth() + 1)})`}
+			</Title>
+			<Container>
+				<FormWrapper>
+					<form onSubmit={handleSubmit(onValid)}>
+						<label htmlFor="wakeUp">시간 입력 (00:00 ~ 13:00)</label>
+						<input
+							{...register('wakeUpInput', { required: true })}
+							autoComplete="off"
+							type="time"
+							id="wakeUp"
+							min="00:00"
+							max="13:00"
+						/>
+						<button>제출</button>
+					</form>
+					<DeleteButton onClick={deleteToday} type="button">
+						오늘 일어난 시간 삭제하기
+					</DeleteButton>
+				</FormWrapper>
+				<ChartWrapper>
+					<ApexChart
+						type="line"
+						series={[
+							{
+								name: '기상 시간',
+								data: wakeUpTime,
 							},
-							toolbar: {
-								show: false,
+						]}
+						options={{
+							chart: {
+								height: 350,
+								type: 'line',
+								dropShadow: {
+									enabled: true,
+									color: '#000',
+									top: 18,
+									left: 7,
+									blur: 10,
+									opacity: 0.2,
+								},
+								toolbar: {
+									show: false,
+								},
 							},
-						},
-						colors: ['#0c9df1', '#545454'],
-						dataLabels: {
-							enabled: true,
-							formatter: (value) => {
-								return timeConverter(value as number);
+							colors: ['#4CC9FF', '#545454'], // 그래프 색 바꾸는 곳
+							dataLabels: {
+								enabled: false,
+								offsetX: -10,
+								offsetY: -5,
+								formatter: (value) => {
+									return timeConverter(value as number);
+								},
+								background: {
+									foreColor: 'white', // dataLabel의 text 색상
+									borderWidth: 0,
+									dropShadow: {
+										enabled: false,
+									},
+								},
 							},
-						},
-						stroke: {
-							curve: 'smooth',
-						},
-						title: {
-							text: '일어난 시간 그래프',
-							align: 'left',
-						},
-						grid: {
-							borderColor: '#e7e7e7',
-							row: {
-								colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-								opacity: 0.5,
+							stroke: {
+								curve: 'smooth',
 							},
-						},
-						markers: {
-							size: 1,
-						},
-						xaxis: {
-							categories: dateArr,
 							title: {
-								text: '날짜',
-							},
-						},
-						yaxis: {
-							tickAmount: 7,
-							min: 0,
-							max: 14,
-							labels: {
-								formatter: (value) => {
-									return timeConverter(value);
+								text: '기상 시간',
+								align: 'left',
+								style: {
+									fontSize: '50px',
 								},
 							},
-						},
-						legend: {
-							position: 'top',
-							horizontalAlign: 'right',
-							floating: true,
-							offsetY: -25,
-							offsetX: -5,
-						},
-						tooltip: {
-							y: {
-								formatter: (value) => {
-									return timeConverter(value);
+							grid: {
+								show: true,
+								borderColor: '#e7e7e775',
+								row: {
+									colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+									opacity: 0.5,
+								},
+								xaxis: {
+									lines: {
+										show: true,
+									},
+								},
+								yaxis: {
+									lines: {
+										show: false,
+									},
 								},
 							},
-						},
-					}}
-				/>
-			</ChartWrapper>
+							markers: {
+								size: 1,
+							},
+							xaxis: {
+								categories: dateArr,
+								title: {
+									text: '2021 - 11',
+								},
+							},
+							yaxis: {
+								tickAmount: 13,
+								min: 0,
+								max: 13,
+								labels: {
+									formatter: (value) => {
+										return timeConverter(value);
+									},
+									style: {
+										fontSize: '12px',
+									},
+								},
+							},
+							legend: {
+								position: 'top',
+								horizontalAlign: 'right',
+								floating: true,
+								offsetY: -25,
+								offsetX: -5,
+							},
+							tooltip: {
+								y: {
+									formatter: (value) => {
+										return timeConverter(value);
+									},
+								},
+							},
+						}}
+					/>
+				</ChartWrapper>
+			</Container>
 		</>
 	);
 }
