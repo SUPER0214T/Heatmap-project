@@ -123,7 +123,10 @@ function SleepChart() {
 					<DeleteButton onClick={deleteToday} type="button">
 						오늘 취침 시간 삭제하기
 					</DeleteButton>
-					<div>평균 취침 시간: {sleepAverageTime(sleepTime)}</div>
+					<div>
+						평균 취침 시간:{' '}
+						{sleepTime.length ? sleepAverageTime(sleepTime) : 'x'}
+					</div>
 				</FormWrapper>
 				<ChartWrapper>
 					<ApexChart

@@ -115,7 +115,9 @@ function Chart() {
 					<DeleteButton onClick={deleteToday} type="button">
 						오늘 기상 시간 삭제하기
 					</DeleteButton>
-					<div>평균 기상 시간: {averageTime(wakeUpTime)}</div>
+					<div>
+						평균 기상 시간: {wakeUpTime.length ? averageTime(wakeUpTime) : 'x'}
+					</div>
 				</FormWrapper>
 				<ChartWrapper>
 					<ApexChart
