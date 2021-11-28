@@ -37,13 +37,13 @@ function SleepChart() {
 		}
 		const numberTimeSplit = stringTimeSplit[0] + stringTimeSplit[1] * oneMinute;
 		let newData: string[];
-		const isToady = dateArr.findIndex((el) => el === todayDate);
+		const isToady = dateArr.findIndex((el) => el === todayDate - 1); // 일어난 날짜가 28일이면 27일에 잠을 자고 일어난 것이니까 하루 뺐음
 		const copyTime = [...sleepTime];
 		let copyDateArr;
 
 		if (isToady === -1) {
 			setDateArr((oldArr) => {
-				copyDateArr = [...oldArr, todayDate];
+				copyDateArr = [...oldArr, todayDate - 1];
 				return copyDateArr;
 			});
 			console.log('여기는 오늘 데이터 없을 때 추가하는 곳');
@@ -76,7 +76,7 @@ function SleepChart() {
 
 	const deleteToday = () => {
 		/* useState의 배열에 오늘 날짜(26)일이 없으면 삭제 못 함 당일만 삭제/수정 가능 */
-		const isToday = dateArr.findIndex((el) => el === todayDate);
+		const isToday = dateArr.findIndex((el) => el === todayDate - 1);
 		if (isToday === -1) {
 			alert('이전의 시간은 삭제할 수 없습니다.');
 		} else {
