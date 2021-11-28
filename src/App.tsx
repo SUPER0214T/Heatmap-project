@@ -1,6 +1,7 @@
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 import Chart from './components/Chart';
+import SleepChart from './components/SleepChart';
 
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -60,6 +61,7 @@ const GlobalStyle = createGlobalStyle`
   button {
     outline: none;
     border: none;
+    cursor: pointer;
   }
 `;
 
@@ -68,6 +70,8 @@ function App() {
 		<>
 			<GlobalStyle />
 			<Chart />
+			<hr />
+			<SleepChart />
 		</>
 	);
 }
