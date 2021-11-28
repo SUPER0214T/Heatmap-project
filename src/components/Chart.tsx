@@ -44,12 +44,12 @@ function Chart() {
 			});
 			console.log('여기는 오늘 데이터 없을 때 추가하는 곳');
 
-			newData = [...copyTime, numberTimeSplit.toFixed(1) + ''];
+			newData = [...copyTime, numberTimeSplit + ''];
 			setWakeUpTime(newData);
 		} else {
 			console.log('여기는 일어난 시간 수정하는 곳');
 			copyDateArr = [...dateArr]; // 계속 copyDateArr가 없다고 뜨거나 isToday가 -1일 때만 줘서 이상하게 동작했음
-			copyTime[isToady] = numberTimeSplit.toFixed(1) + '';
+			copyTime[isToady] = numberTimeSplit + '';
 			newData = copyTime;
 			setWakeUpTime(copyTime);
 		}
@@ -101,19 +101,19 @@ function Chart() {
 			<Container>
 				<FormWrapper>
 					<form onSubmit={handleSubmit(onValid)}>
-						<label htmlFor="wakeUp">시간 입력 (00:00 ~ 13:00)</label>
+						<label htmlFor="wakeUp">시간 입력 (02:00 ~ 13:00)</label>
 						<input
 							{...register('wakeUpInput', { required: true })}
 							autoComplete="off"
 							type="time"
 							id="wakeUp"
-							min="00:00"
+							min="02:00"
 							max="13:00"
 						/>
 						<button>제출</button>
 					</form>
 					<DeleteButton onClick={deleteToday} type="button">
-						오늘 일어난 시간 삭제하기
+						오늘 기상 시간 삭제하기
 					</DeleteButton>
 				</FormWrapper>
 				<ChartWrapper>
@@ -195,8 +195,8 @@ function Chart() {
 								},
 							},
 							yaxis: {
-								tickAmount: 13,
-								min: 0,
+								tickAmount: 11,
+								min: 2,
 								max: 13,
 								labels: {
 									formatter: (value) => {
