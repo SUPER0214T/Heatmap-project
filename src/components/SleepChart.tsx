@@ -3,6 +3,8 @@ import ApexChart from 'react-apexcharts';
 import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import {
+	chartGridColor,
+	chartTextColor,
 	ChartWrapper,
 	Container,
 	DeleteButton,
@@ -10,6 +12,8 @@ import {
 	sleepAverageTime,
 	Title,
 } from '../styles/chart-style';
+import { useRecoilState } from 'recoil';
+import { themeState } from '../atom';
 
 interface ISubmitProps {
 	sleepInput: string;
@@ -21,6 +25,7 @@ const oneMinute = 1 / 60;
 function SleepChart() {
 	const [sleepTime, setSleepTime] = useState<string[]>([]);
 	const [dateArr, setDateArr] = useState<number[]>([3]);
+	const [isDark, setIsDark] = useRecoilState(themeState);
 
 	const { register, handleSubmit, setValue } = useForm();
 	let date = new Date();
@@ -153,7 +158,7 @@ function SleepChart() {
 									show: false,
 								},
 							},
-							colors: ['#4CC9FF', '#545454'], // 그래프 색 바꾸는 곳
+							colors: [isDark ? '#9C90E8' : '#4CC9FF'], // 그래프 색 바꾸는 곳
 							dataLabels: {
 								enabled: false,
 								offsetX: -10,
@@ -177,13 +182,14 @@ function SleepChart() {
 								align: 'left',
 								style: {
 									fontSize: '50px',
+									color: chartTextColor(isDark),
 								},
 							},
 							grid: {
 								show: true,
-								borderColor: '#e7e7e775',
+								borderColor: chartGridColor(isDark),
 								row: {
-									colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+									colors: ['transparent', 'transparent'],
 									opacity: 0.5,
 								},
 								xaxis: {
@@ -204,6 +210,22 @@ function SleepChart() {
 								categories: dateArr,
 								title: {
 									text: '2021 - 11',
+									style: {
+										color: chartTextColor(isDark),
+									},
+								},
+								labels: {
+									style: {
+										colors: chartTextColor(isDark),
+									},
+								},
+								axisBorder: {
+									show: true,
+									color: chartGridColor(isDark),
+								},
+								axisTicks: {
+									show: true,
+									color: chartGridColor(isDark),
 								},
 							},
 							yaxis: {
@@ -216,6 +238,7 @@ function SleepChart() {
 									},
 									style: {
 										fontSize: '12px',
+										colors: chartTextColor(isDark),
 									},
 								},
 							},
@@ -227,6 +250,7 @@ function SleepChart() {
 								offsetX: -5,
 							},
 							tooltip: {
+								theme: isDark ? 'dark' : 'light',
 								y: {
 									formatter: (value) => {
 										return timeConverter(value);

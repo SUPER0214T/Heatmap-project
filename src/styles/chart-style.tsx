@@ -76,3 +76,11 @@ export function sleepAverageTime(timeArray: string[]) {
 		Number(minutes) < 10 ? `0${minutes}` : minutes
 	}`;
 }
+
+export function chartTextColor(isDark: boolean): string {
+	return isDark ? '#C9D1D9' : '#0D1117';
+}
+
+export function chartGridColor(isDark: boolean): string {
+	return isDark ? '#c9d1d940' : '#e7e7e775';
+}

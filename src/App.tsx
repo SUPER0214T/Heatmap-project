@@ -1,7 +1,10 @@
 import React from 'react';
-import { createGlobalStyle } from 'styled-components';
+import { useRecoilState } from 'recoil';
+import { createGlobalStyle, ThemeProvider } from 'styled-components';
+import { themeState } from './atom';
 import Chart from './components/Chart';
 import SleepChart from './components/SleepChart';
+import { darkTheme, lightTheme } from './theme';
 
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -63,15 +66,31 @@ const GlobalStyle = createGlobalStyle`
     border: none;
     cursor: pointer;
   }
+  body {
+    /* transition: background-color .35s ease-in-out, color .35s ease-in-out; */
+    background-color: ${(props) => props.theme.bgColor};
+    color: ${(props) => props.theme.textColor};
+  }
 `;
 
 function App() {
+	const [isDark, setIsDark] = useRecoilState(themeState);
+
 	return (
 		<>
-			<GlobalStyle />
-			<Chart />
-			<hr />
-			<SleepChart />
+			<ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+				<button
+					onClick={() => {
+						setIsDark((prev) => !prev);
+					}}
+				>
+					Theme toggle
+				</button>
+				<GlobalStyle />
+				<Chart />
+				<hr />
+				<SleepChart />
+			</ThemeProvider>
 		</>
 	);
 }

@@ -4,12 +4,16 @@ import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import {
 	averageTime,
+	chartGridColor,
+	chartTextColor,
 	ChartWrapper,
 	Container,
 	DeleteButton,
 	FormWrapper,
 	Title,
 } from '../styles/chart-style';
+import { useRecoilState } from 'recoil';
+import { themeState } from '../atom';
 
 interface ISubmitProps {
 	wakeUpInput: string;
@@ -21,6 +25,7 @@ const oneMinute = 1 / 60;
 function Chart() {
 	const [wakeUpTime, setWakeUpTime] = useState<string[]>([]);
 	const [dateArr, setDateArr] = useState<number[]>([3]);
+	const [isDark, setIsDark] = useRecoilState(themeState);
 
 	const { register, handleSubmit, setValue } = useForm();
 	let date = new Date();
@@ -144,7 +149,7 @@ function Chart() {
 									show: false,
 								},
 							},
-							colors: ['#4CC9FF', '#545454'], // 그래프 색 바꾸는 곳
+							colors: [isDark ? '#9C90E8' : '#4CC9FF'],
 							dataLabels: {
 								enabled: false,
 								offsetX: -10,
@@ -168,13 +173,14 @@ function Chart() {
 								align: 'left',
 								style: {
 									fontSize: '50px',
+									color: chartTextColor(isDark),
 								},
 							},
 							grid: {
 								show: true,
-								borderColor: '#e7e7e775',
+								borderColor: chartGridColor(isDark),
 								row: {
-									colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+									colors: ['transparent', 'transparent'],
 									opacity: 0.5,
 								},
 								xaxis: {
@@ -195,6 +201,22 @@ function Chart() {
 								categories: dateArr,
 								title: {
 									text: '2021 - 11',
+									style: {
+										color: chartTextColor(isDark),
+									},
+								},
+								labels: {
+									style: {
+										colors: chartTextColor(isDark),
+									},
+								},
+								axisBorder: {
+									show: true,
+									color: chartGridColor(isDark),
+								},
+								axisTicks: {
+									show: true,
+									color: chartGridColor(isDark),
 								},
 							},
 							yaxis: {
@@ -207,6 +229,7 @@ function Chart() {
 									},
 									style: {
 										fontSize: '12px',
+										colors: chartTextColor(isDark),
 									},
 								},
 							},
@@ -218,6 +241,7 @@ function Chart() {
 								offsetX: -5,
 							},
 							tooltip: {
+								theme: isDark ? 'dark' : 'light',
 								y: {
 									formatter: (value) => {
 										return timeConverter(value);
