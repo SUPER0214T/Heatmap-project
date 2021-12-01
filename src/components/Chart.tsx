@@ -24,47 +24,68 @@ interface ISubmitProps {
 const oneMinute = 1 / 60;
 
 function Chart() {
-	const [chartDB, setChartDB] = useRecoilState<IChartData[]>(chartData);
-	const [wakeUpData, setWakeUpData] = useState<IChartData>();
+	const [wakeUpData, setWakeUpData] = useState<IChartData[]>([]);
 	const navigate = useNavigate();
-
+	const [isinputDisable, setIsinputDisable] = useState(false);
 	const [isDark, setIsDark] = useRecoilState(themeState);
 	const { id } = useParams();
 	const { register, handleSubmit, setValue } = useForm();
 	let date = new Date();
-
-	console.log(wakeUpData?.wakeUpDateTrack);
 	const todayDate = date.getDate();
 
-	useEffect(() => {
-		const currentMonthData = chartDB.find((el) => el.date === id);
-		if (currentMonthData === undefined) {
-			const response = localStorage.getItem('userWakeUpChartData');
-			if (!response) {
-				// 데이터 없는데 들어왔다면 메인 페이지로
-				navigate('/');
-			} else {
-				const storageData: IChartData[] = JSON.parse(response);
-				setWakeUpData(storageData.find((el) => el.date === id));
-				setChartDB(storageData);
-			}
+	// 변경사항을 localStorage에 저장하는 함수
+	function sendToLocalStorage() {
+		console.log('wakeUpData', wakeUpData);
+		const response = localStorage.getItem('userWakeUpChartData');
+		if (!response) {
+			console.log('response에 데이터 없음!');
+			return;
 		} else {
-			setWakeUpData(currentMonthData);
+			const storageData: IChartData[] = JSON.parse(response);
+			storageData.splice(
+				storageData.findIndex((el) => el?.date === id),
+				1,
+				wakeUpData[0]
+			);
+			console.log('기상 시간 변경 함수 실행!');
+			localStorage.setItem('userWakeUpChartData', JSON.stringify(storageData));
+		}
+	}
+
+	// wakeUpData가 변경될 때마다 localStorage에 저장해줌
+	useEffect(() => {
+		if (wakeUpData !== null || wakeUpData !== undefined) {
+			if (wakeUpData.length !== 0) {
+				sendToLocalStorage();
+			}
+		}
+	}, [wakeUpData]);
+
+	useEffect(() => {
+		const response = localStorage.getItem('userWakeUpChartData');
+		if (!response) {
+			// 데이터 없는데 들어왔다면 메인 페이지로
+			navigate('/');
+		} else {
+			const storageData: IChartData[] = JSON.parse(response);
+			const storageFind = storageData.find((el) => el?.date === id);
+			if (storageFind === undefined) return;
+			setWakeUpData([storageFind]);
+			console.log(
+				'chat의 storageData: ',
+				storageData.find((el) => el?.date === id)
+			);
 		}
 	}, []);
 
+	// input의 disabled 설정
 	useEffect(() => {
-		// chart 페이지 나가면 localStorage에 변경된 모든 데이터 저장하면서 나가기
-		if (wakeUpData === undefined) return;
-		const copyChartDB = [...chartDB];
-		copyChartDB.splice(
-			chartDB.findIndex((el) => el.date === id),
-			1,
-			wakeUpData
-		);
-		console.log('기상 시간 변경!');
-		localStorage.setItem('userWakeUpChartData', JSON.stringify(copyChartDB));
-	}, [wakeUpData]);
+		if (`${date.getFullYear()}${date.getMonth() + 1}` === id) {
+			setIsinputDisable(false);
+		} else {
+			setIsinputDisable(true);
+		}
+	}, []);
 
 	// 일어난 시간 설정
 	const onValid = ({ wakeUpInput }: ISubmitProps) => {
@@ -74,11 +95,11 @@ function Chart() {
 
 		const numberTimeSplit = stringTimeSplit[0] + stringTimeSplit[1] * oneMinute;
 		let newTimeTrack: string[];
-		const isToady = wakeUpData?.wakeUpDateTrack.findIndex(
+		const isToady = wakeUpData[0]?.wakeUpDateTrack.findIndex(
 			(el) => el === todayDate
 		); // 새로운 값으로 바뀐 것에서 찾도록 해야 함
-		if (wakeUpData?.wakeUpDateTrack === undefined) return;
-		const copyTime = [...wakeUpData?.wakeUpTimeTrack];
+		if (wakeUpData[0]?.wakeUpDateTrack === undefined) return;
+		const copyTime = [...wakeUpData[0]?.wakeUpTimeTrack];
 		let copyDateArr;
 
 		// const prevMonthLastDate = (new Date(date.getFullYear(), date.getMonth(), 0)).getDate() // 이전 달의 마지막 날짜
@@ -90,51 +111,45 @@ function Chart() {
 		if (isToady === -1) {
 			// 오늘 날짜가 없으면 날짜를 추가하고, 기상 시간도 함께 추가한다.
 			newTimeTrack = [...copyTime, numberTimeSplit + ''];
-			setWakeUpData(() => {
-				copyDateArr = [...wakeUpData?.wakeUpDateTrack, todayDate];
-				return {
-					...wakeUpData,
-					wakeUpDateTrack: copyDateArr,
-					wakeUpTimeTrack: newTimeTrack,
-				};
-			});
+			copyDateArr = [...wakeUpData[0]?.wakeUpDateTrack, todayDate];
+			let newData2: IChartData = {
+				...wakeUpData[0],
+				wakeUpDateTrack: copyDateArr,
+				wakeUpTimeTrack: newTimeTrack,
+			};
+			setWakeUpData([newData2]);
 		} else {
 			// 오늘 날짜가 있으면 날짜를 추가하지 않고 기상 시간만 수정한다.
 			if (isToady === undefined) return;
 			console.log('여기는 일어난 시간 수정하는 곳');
 			copyTime[isToady] = numberTimeSplit + '';
-			setWakeUpData({ ...wakeUpData, wakeUpTimeTrack: copyTime });
+			setWakeUpData([{ ...wakeUpData[0], wakeUpTimeTrack: copyTime }]);
 		}
 		setValue('wakeUpInput', '');
 	};
 
 	const deleteToday = () => {
 		/* useState의 배열에 오늘 날짜(26)일이 없으면 삭제 못 함 당일만 삭제/수정 가능 */
-		const isToday = wakeUpData?.wakeUpDateTrack.findIndex(
+		const isToday = wakeUpData[0]?.wakeUpDateTrack.findIndex(
 			(el) => el === todayDate
 		);
+		console.log('isToday: ', isToday);
 		if (isToday === -1) {
 			alert('이전의 시간은 삭제할 수 없습니다.');
 		} else {
-			if (
-				wakeUpData?.wakeUpTimeTrack === undefined ||
-				wakeUpData?.wakeUpDateTrack === undefined ||
-				isToday === undefined
-			)
-				return;
-			const copyWakeUpTime = [...wakeUpData?.wakeUpTimeTrack];
-			const copyDateArr = [...wakeUpData?.wakeUpDateTrack];
+			const copyWakeUpTime = [...wakeUpData[0]?.wakeUpTimeTrack];
+			const copyDateArr = [...wakeUpData[0]?.wakeUpDateTrack];
 			copyWakeUpTime.splice(isToday, 1);
 			copyDateArr.splice(isToday, 1);
-			setWakeUpData(() => {
-				return {
-					...wakeUpData,
-					wakeUpDateTrack: copyDateArr,
-					wakeUpTimeTrack: copyWakeUpTime,
-				};
+			setWakeUpData((old) => {
+				return [
+					{
+						...old[0],
+						wakeUpDateTrack: copyDateArr,
+						wakeUpTimeTrack: copyWakeUpTime,
+					},
+				];
 			});
-			localStorage.setItem('wakeUpTimeTrack', JSON.stringify(copyWakeUpTime));
-			localStorage.setItem('wakeUpDateTrack', JSON.stringify(copyDateArr));
 		}
 	};
 
@@ -150,7 +165,7 @@ function Chart() {
 		<>
 			<Title>
 				기상 시간 그래프
-				{`(${date.getFullYear() + ' - ' + (date.getMonth() + 1)})`}
+				{`(${id?.substring(0, 4)}-${id?.substring(4)})`}
 			</Title>
 			<Container>
 				<FormWrapper>
@@ -163,27 +178,32 @@ function Chart() {
 							id="wakeUp"
 							min="02:00"
 							max="13:00"
+							disabled={isinputDisable}
 						/>
-						<button>제출</button>
+						<button disabled={isinputDisable}>제출</button>
 					</form>
-					<DeleteButton onClick={deleteToday} type="button">
+					<DeleteButton
+						onClick={deleteToday}
+						type="button"
+						disabled={isinputDisable}
+					>
 						오늘 기상 시간 삭제하기
 					</DeleteButton>
 					<div>
 						평균 기상 시간:{' '}
-						{wakeUpData?.wakeUpTimeTrack.length
-							? averageTime(wakeUpData?.wakeUpTimeTrack)
+						{wakeUpData[0]?.wakeUpTimeTrack.length
+							? averageTime(wakeUpData[0]?.wakeUpTimeTrack)
 							: 'x'}
 					</div>
 				</FormWrapper>
-				{wakeUpData?.wakeUpTimeTrack !== undefined ? (
+				{wakeUpData[0]?.wakeUpTimeTrack !== undefined ? (
 					<ChartWrapper>
 						<ApexChart
 							type="line"
 							series={[
 								{
 									name: '기상 시간',
-									data: wakeUpData?.wakeUpTimeTrack,
+									data: wakeUpData[0]?.wakeUpTimeTrack,
 								},
 							]}
 							options={{
@@ -251,9 +271,9 @@ function Chart() {
 									size: 1,
 								},
 								xaxis: {
-									categories: wakeUpData?.wakeUpDateTrack,
+									categories: wakeUpData[0]?.wakeUpDateTrack,
 									title: {
-										text: '2021 - 11',
+										text: `${id?.substring(0, 4)}-${id?.substring(4)}`,
 										style: {
 											color: chartTextColor(isDark),
 										},
