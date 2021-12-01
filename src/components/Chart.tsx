@@ -14,7 +14,7 @@ import {
 } from '../styles/chart-style';
 import { useRecoilState } from 'recoil';
 import { chartData, IChartData, themeState } from '../atoms';
-import { Navigate, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 interface ISubmitProps {
 	wakeUpInput: string;
@@ -28,9 +28,6 @@ function Chart() {
 	const [wakeUpData, setWakeUpData] = useState<IChartData>();
 	const navigate = useNavigate();
 
-	// oldData
-	const [wakeUpTime, setWakeUpTime] = useState<string[]>([]);
-	const [dateArr, setDateArr] = useState<number[]>([3]);
 	const [isDark, setIsDark] = useRecoilState(themeState);
 	const { id } = useParams();
 	const { register, handleSubmit, setValue } = useForm();
@@ -38,44 +35,6 @@ function Chart() {
 
 	console.log(wakeUpData?.wakeUpDateTrack);
 	const todayDate = date.getDate();
-	// 일어난 시간 설정
-	const onValid = ({ wakeUpInput }: ISubmitProps) => {
-		const stringTimeSplit = wakeUpInput
-			.split(/\:/gi)
-			.map((stringTime) => Number(stringTime));
-
-		const numberTimeSplit = stringTimeSplit[0] + stringTimeSplit[1] * oneMinute;
-		let newData;
-		const isToady = dateArr.findIndex((el) => el === todayDate); // 새로운 값으로 바뀐 것에서 찾도록 해야 함
-		const copyTime = [...wakeUpTime];
-		let copyDateArr;
-
-		// const prevMonthLastDate = (new Date(date.getFullYear(), date.getMonth(), 0)).getDate() // 이전 달의 마지막 날짜
-		// 날짜 지나면 추가하는 것 막아야 함
-		// if() {} 데이터에 접근해서 date의 몇 월인지 가져오고 date.getMonth()와 다르면 alert로 "다음 달에서 작성해야 합니다." 라고 알림 띄우기 -> useParams의 202112와 현재가 다르면
-		// SleepChart에서는 시작 날짜를 이전 달의마지막 일자로 넣어서 시작하도록 함 -> 30 1 2 3 이렇게 이전 달의 마지막 날을 시작으로
-		// 데이터 받아온 후 findIndex -> find로 걸러서 값 수정해서 다시 넣는다.
-		if (isToady === -1) {
-			setDateArr((oldArr) => {
-				copyDateArr = [...oldArr, todayDate]; // push로 바꿔서 넣도록 하자
-				return copyDateArr;
-			});
-			console.log('여기는 오늘 데이터 없을 때 추가하는 곳');
-
-			newData = [...copyTime, numberTimeSplit + ''];
-			setWakeUpTime(newData);
-		} else {
-			console.log('여기는 일어난 시간 수정하는 곳');
-			copyDateArr = [...dateArr]; // 계속 copyDateArr가 없다고 뜨거나 isToday가 -1일 때만 줘서 이상하게 동작했음
-			copyTime[isToady] = numberTimeSplit + '';
-			newData = copyTime;
-			setWakeUpTime(copyTime);
-		}
-
-		setValue('wakeUpInput', '');
-		localStorage.setItem('wakeUpTimeTrack', JSON.stringify(newData));
-		localStorage.setItem('wakeUpDateTrack', JSON.stringify(copyDateArr));
-	};
 
 	useEffect(() => {
 		const currentMonthData = chartDB.find((el) => el.date === id);
@@ -94,18 +53,86 @@ function Chart() {
 		}
 	}, []);
 
+	useEffect(() => {
+		// chart 페이지 나가면 localStorage에 변경된 모든 데이터 저장하면서 나가기
+		if (wakeUpData === undefined) return;
+		const copyChartDB = [...chartDB];
+		copyChartDB.splice(
+			chartDB.findIndex((el) => el.date === id),
+			1,
+			wakeUpData
+		);
+		console.log('기상 시간 변경!');
+		localStorage.setItem('userWakeUpChartData', JSON.stringify(copyChartDB));
+	}, [wakeUpData]);
+
+	// 일어난 시간 설정
+	const onValid = ({ wakeUpInput }: ISubmitProps) => {
+		const stringTimeSplit = wakeUpInput
+			.split(/\:/gi)
+			.map((stringTime) => Number(stringTime));
+
+		const numberTimeSplit = stringTimeSplit[0] + stringTimeSplit[1] * oneMinute;
+		let newTimeTrack: string[];
+		const isToady = wakeUpData?.wakeUpDateTrack.findIndex(
+			(el) => el === todayDate
+		); // 새로운 값으로 바뀐 것에서 찾도록 해야 함
+		if (wakeUpData?.wakeUpDateTrack === undefined) return;
+		const copyTime = [...wakeUpData?.wakeUpTimeTrack];
+		let copyDateArr;
+
+		// const prevMonthLastDate = (new Date(date.getFullYear(), date.getMonth(), 0)).getDate() // 이전 달의 마지막 날짜
+		// 날짜 지나면 추가하는 것 막아야 함
+		// if() {} 데이터에 접근해서 date의 몇 월인지 가져오고 date.getMonth()와 다르면 alert로 "다음 달에서 작성해야 합니다." 라고 알림 띄우기 -> useParams의 202112와 현재가 다르면
+		// SleepChart에서는 시작 날짜를 이전 달의마지막 일자로 넣어서 시작하도록 함 -> 30 1 2 3 이렇게 이전 달의 마지막 날을 시작으로
+		// 데이터 받아온 후 findIndex -> find로 걸러서 값 수정해서 다시 넣는다.
+
+		if (isToady === -1) {
+			// 오늘 날짜가 없으면 날짜를 추가하고, 기상 시간도 함께 추가한다.
+			newTimeTrack = [...copyTime, numberTimeSplit + ''];
+			setWakeUpData(() => {
+				copyDateArr = [...wakeUpData?.wakeUpDateTrack, todayDate];
+				return {
+					...wakeUpData,
+					wakeUpDateTrack: copyDateArr,
+					wakeUpTimeTrack: newTimeTrack,
+				};
+			});
+		} else {
+			// 오늘 날짜가 있으면 날짜를 추가하지 않고 기상 시간만 수정한다.
+			if (isToady === undefined) return;
+			console.log('여기는 일어난 시간 수정하는 곳');
+			copyTime[isToady] = numberTimeSplit + '';
+			setWakeUpData({ ...wakeUpData, wakeUpTimeTrack: copyTime });
+		}
+		setValue('wakeUpInput', '');
+	};
+
 	const deleteToday = () => {
 		/* useState의 배열에 오늘 날짜(26)일이 없으면 삭제 못 함 당일만 삭제/수정 가능 */
-		const isToday = dateArr.findIndex((el) => el === todayDate);
+		const isToday = wakeUpData?.wakeUpDateTrack.findIndex(
+			(el) => el === todayDate
+		);
 		if (isToday === -1) {
 			alert('이전의 시간은 삭제할 수 없습니다.');
 		} else {
-			const copyWakeUpTime = [...wakeUpTime];
-			const copyDateArr = [...dateArr];
+			if (
+				wakeUpData?.wakeUpTimeTrack === undefined ||
+				wakeUpData?.wakeUpDateTrack === undefined ||
+				isToday === undefined
+			)
+				return;
+			const copyWakeUpTime = [...wakeUpData?.wakeUpTimeTrack];
+			const copyDateArr = [...wakeUpData?.wakeUpDateTrack];
 			copyWakeUpTime.splice(isToday, 1);
 			copyDateArr.splice(isToday, 1);
-			setWakeUpTime(copyWakeUpTime);
-			setDateArr(copyDateArr);
+			setWakeUpData(() => {
+				return {
+					...wakeUpData,
+					wakeUpDateTrack: copyDateArr,
+					wakeUpTimeTrack: copyWakeUpTime,
+				};
+			});
 			localStorage.setItem('wakeUpTimeTrack', JSON.stringify(copyWakeUpTime));
 			localStorage.setItem('wakeUpDateTrack', JSON.stringify(copyDateArr));
 		}
@@ -285,4 +312,4 @@ function Chart() {
 	);
 }
 
-export default Chart;
+export default React.memo(Chart);
