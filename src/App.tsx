@@ -1,10 +1,12 @@
-import React from 'react';
+import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { createGlobalStyle, ThemeProvider } from 'styled-components';
-import { themeState } from './atom';
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
+import { chartData, IChartData, themeState } from './atoms';
 import Chart from './components/Chart';
 import SleepChart from './components/SleepChart';
 import { darkTheme, lightTheme } from './theme';
+import { Routes, Route, Link } from 'react-router-dom';
 
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -73,12 +75,80 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+// 버튼이 이상하게 애니메이션 되니까 useState로 보였다 안보였다 + layoutId
+const ToggleButton = styled(motion.div)<{ isToggle: boolean }>`
+	width: 80px;
+	height: 50px;
+	background-color: rgba(0, 0, 0, 0.185);
+	display: flex;
+	justify-content: ${(props) => (props.isToggle ? 'flex-start' : 'flex-end')};
+	border-radius: 25px;
+	padding: 5px;
+	cursor: pointer;
+
+	.handle {
+		width: 40px;
+		height: 40px;
+		background-color: white;
+		border-radius: 20px;
+	}
+`;
+
 function App() {
 	const [isDark, setIsDark] = useRecoilState(themeState);
+	const [chartDB, setChartDB] = useRecoilState<IChartData[]>(chartData);
+	let date = new Date();
+	const currentDate = `${date.getFullYear()}${
+		date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
+	}`;
+
+	const newLocalData: IChartData[] = [
+		{
+			date: currentDate,
+			wakeUpDateTrack: [],
+			wakeUpTimeTrack: [],
+			sleepDateTrack: [],
+			sleepTimeTrack: [],
+		},
+	];
+
+	useEffect(() => {
+		const response = localStorage.getItem('userWakeUpChartData');
+
+		if (!response) {
+			// 처음 들어왔을 때 바로 아래 실행
+			setChartDB([...newLocalData]);
+			localStorage.setItem('userWakeUpChartData', JSON.stringify(newLocalData));
+		} else {
+			const storageData: IChartData[] = JSON.parse(response);
+			const isCurrent = storageData.findIndex((el) => el.date === currentDate); // 현재 Year&Month인지 확인
+
+			if (isCurrent !== -1) {
+				// 11월 -> 12월로 바뀌면 새로운 date: Year&Month 를 추가
+				setChartDB(storageData);
+			} else {
+				let newDB;
+				setChartDB((oldData) => {
+					newDB = [...oldData, ...newLocalData];
+					return newDB;
+				});
+				localStorage.setItem('userWakeUpChartData', JSON.stringify(newDB));
+			}
+		}
+	}, []);
+
+	const [isOn, setIsOn] = useState(false);
+	const toggleSwitch = () => {
+		setIsOn(!isOn);
+		setIsDark((prev) => !prev);
+	};
 
 	return (
 		<>
 			<ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+				<ToggleButton className="switch" isToggle={isOn} onClick={toggleSwitch}>
+					<motion.div className="handle" />
+				</ToggleButton>
 				<button
 					onClick={() => {
 						setIsDark((prev) => !prev);
@@ -87,9 +157,26 @@ function App() {
 					Theme toggle
 				</button>
 				<GlobalStyle />
-				<Chart />
-				<hr />
-				<SleepChart />
+				<Link to="/">메인 페이지/</Link>
+				{chartDB.map((el) => (
+					<Link to={`/${el.date}`}>
+						{el.date.substring(0, 4)}년도 {el.date.substring(4)}월 그래프
+					</Link>
+				))}
+
+				<Routes>
+					<Route
+						path="/:id"
+						element={
+							<>
+								<Chart />
+								<hr />
+								<SleepChart />
+							</>
+						}
+					/>
+					<Route path="/" element={<span>메인</span>} />
+				</Routes>
 			</ThemeProvider>
 		</>
 	);
