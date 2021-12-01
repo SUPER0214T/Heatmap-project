@@ -7,6 +7,7 @@ import Chart from './components/Chart';
 import SleepChart from './components/SleepChart';
 import { darkTheme, lightTheme } from './theme';
 import { Routes, Route, Link } from 'react-router-dom';
+import Main from './components/Main';
 
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -98,44 +99,6 @@ function App() {
 	const [isDark, setIsDark] = useRecoilState(themeState);
 	const [chartDB, setChartDB] = useRecoilState<IChartData[]>(chartData);
 	let date = new Date();
-	const currentDate = `${date.getFullYear()}${
-		date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
-	}`;
-
-	const newLocalData: IChartData[] = [
-		{
-			date: currentDate,
-			wakeUpDateTrack: [],
-			wakeUpTimeTrack: [],
-			sleepDateTrack: [],
-			sleepTimeTrack: [],
-		},
-	];
-
-	useEffect(() => {
-		const response = localStorage.getItem('userWakeUpChartData');
-
-		if (!response) {
-			// 처음 들어왔을 때 바로 아래 실행
-			setChartDB([...newLocalData]);
-			localStorage.setItem('userWakeUpChartData', JSON.stringify(newLocalData));
-		} else {
-			const storageData: IChartData[] = JSON.parse(response);
-			const isCurrent = storageData.findIndex((el) => el.date === currentDate); // 현재 Year&Month인지 확인
-
-			if (isCurrent !== -1) {
-				// 11월 -> 12월로 바뀌면 새로운 date: Year&Month 를 추가
-				setChartDB(storageData);
-			} else {
-				let newDB;
-				setChartDB((oldData) => {
-					newDB = [...oldData, ...newLocalData];
-					return newDB;
-				});
-				localStorage.setItem('userWakeUpChartData', JSON.stringify(newDB));
-			}
-		}
-	}, []);
 
 	const [isOn, setIsOn] = useState(false);
 	const toggleSwitch = () => {
@@ -152,6 +115,7 @@ function App() {
 				<button
 					onClick={() => {
 						setIsDark((prev) => !prev);
+						console.log(chartDB);
 					}}
 				>
 					Theme toggle
@@ -159,8 +123,8 @@ function App() {
 				<GlobalStyle />
 				<Link to="/">메인 페이지/</Link>
 				{chartDB.map((el) => (
-					<Link to={`/${el.date}`}>
-						{el.date.substring(0, 4)}년도 {el.date.substring(4)}월 그래프
+					<Link to={`/${el?.date}`}>
+						{el?.date.substring(0, 4)}년도 {el?.date.substring(4)}월 그래프
 					</Link>
 				))}
 
@@ -175,7 +139,7 @@ function App() {
 							</>
 						}
 					/>
-					<Route path="/" element={<span>메인</span>} />
+					<Route path="/" element={<Main />} />
 				</Routes>
 			</ThemeProvider>
 		</>
