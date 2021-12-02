@@ -13,7 +13,7 @@ import {
 	Title,
 } from '../styles/chart-style';
 import { useRecoilState } from 'recoil';
-import { themeState } from '../atom';
+import { themeState } from '../atoms';
 
 interface ISubmitProps {
 	sleepInput: string;
@@ -42,30 +42,45 @@ function SleepChart() {
 		}
 		const numberTimeSplit = stringTimeSplit[0] + stringTimeSplit[1] * oneMinute;
 		let newData: string[];
-		const isToady = dateArr.findIndex((el) => el === todayDate - 1); // 일어난 날짜가 28일이면 27일에 잠을 자고 일어난 것이니까 하루 뺐음
+		let isToday = dateArr.findIndex((el) => el === todayDate - 1); // 일어난 날짜가 28일이면 27일에 잠을 자고 일어난 것이니까 하루 뺐음
+
+		// date가 빈 배열일 때는 isToday = 0일 필요가 없음 ->
+		if (todayDate - 1 === 0) {
+			// 새로운 달 이니까 배열의 첫 번째로 이전 달의 마지막 날짜가 들어가야 한다. -> 0번째 index에 이전 달의 마지막 날짜를 넣으면 됨
+			if (dateArr.length === 1) {
+				isToday = 0;
+			}
+		}
+
 		const copyTime = [...sleepTime];
 		let copyDateArr;
 
-		if (isToady === -1) {
-			setDateArr((oldArr) => {
-				copyDateArr = [...oldArr, todayDate - 1];
-				return copyDateArr;
-			});
-			console.log('여기는 오늘 데이터 없을 때 추가하는 곳');
-
+		if (isToday === -1) {
+			if (todayDate - 1 === 0) {
+				// 오늘이 1일 이라면 이전 달의 마지막 날을 date 배열로 추가한다. -> 30 1 2 3 이렇게 이전 달의 마지막 날부터 시작하는 형식임
+				const prevMonthLastDate = new Date(
+					date.getFullYear(),
+					date.getMonth(),
+					0
+				).getDate();
+				setDateArr((oldArr) => {
+					copyDateArr = [...oldArr, prevMonthLastDate];
+					return copyDateArr;
+				});
+			} else {
+				setDateArr((oldArr) => {
+					copyDateArr = [...oldArr, todayDate - 1];
+					return copyDateArr;
+				});
+			}
 			newData = [...copyTime, numberTimeSplit + ''];
 			setSleepTime(newData);
 		} else {
-			console.log('여기는 일어난 시간 수정하는 곳');
 			copyDateArr = [...dateArr]; // 계속 copyDateArr가 없다고 뜨거나 isToday가 -1일 때만 줘서 이상하게 동작했음
-			copyTime[isToady] = numberTimeSplit + '';
+			copyTime[isToday] = numberTimeSplit + ''; // 1일에는 이전 달의 마지막 날짜가 추가되어서 수정하려고 할 때 isToady가 계속 현재 날짜 1일이 없다고 나와서 계속 데이터 추가됨
 			newData = copyTime;
-			if (newData) {
-			}
 			setSleepTime(copyTime);
-			console.log(newData);
 		}
-
 		setValue('sleepInput', '');
 		localStorage.setItem('sleepTimeTrack', JSON.stringify(newData));
 		localStorage.setItem('sleepDateTrack', JSON.stringify(copyDateArr));
