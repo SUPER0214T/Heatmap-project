@@ -13,7 +13,8 @@ import {
 	Title,
 } from '../styles/chart-style';
 import { useRecoilState } from 'recoil';
-import { themeState } from '../atoms';
+import { IChartData, themeState } from '../atoms';
+import { useNavigate, useParams } from 'react-router';
 
 interface ISubmitProps {
 	sleepInput: string;
@@ -23,13 +24,72 @@ interface ISubmitProps {
 const oneMinute = 1 / 60;
 
 function SleepChart() {
-	const [sleepTime, setSleepTime] = useState<string[]>([]);
-	const [dateArr, setDateArr] = useState<number[]>([3]);
-	const [isDark, setIsDark] = useRecoilState(themeState);
+	const [sleepData, setSleepData] = useState<IChartData[]>([]);
 
+	// old data type
+	// const [sleepTime, setSleepTime] = useState<string[]>([]);
+	// const [dateArr, setDateArr] = useState<number[]>([3]);
+	const [isDark, setIsDark] = useRecoilState(themeState);
+	const { id } = useParams();
 	const { register, handleSubmit, setValue } = useForm();
 	let date = new Date();
 	const todayDate = date.getDate();
+	const navigate = useNavigate();
+	const [isinputDisable, setIsinputDisable] = useState(false);
+
+	// 변경사항을 localStorage에 저장하는 함수
+	function sendToLocalStorage() {
+		console.log('sleepData', sleepData);
+		const response = localStorage.getItem('userWakeUpChartData');
+		if (!response) {
+			console.log('response에 데이터 없음!');
+			return;
+		} else {
+			const storageData: IChartData[] = JSON.parse(response);
+			storageData.splice(
+				storageData.findIndex((el) => el?.date === id),
+				1,
+				sleepData[0]
+			);
+			console.log('기상 시간 변경 함수 실행!');
+			localStorage.setItem('userWakeUpChartData', JSON.stringify(storageData));
+		}
+	}
+
+	// sleepData가 변경될 때마다 localStorage에 저장해줌
+	useEffect(() => {
+		if (sleepData !== null || sleepData !== undefined) {
+			if (sleepData.length !== 0) {
+				sendToLocalStorage();
+			}
+		}
+	}, [sleepData]);
+
+	useEffect(() => {
+		const response = localStorage.getItem('userWakeUpChartData');
+		if (!response) {
+			// 데이터 없는데 들어왔다면 메인 페이지로
+			navigate('/');
+		} else {
+			const storageData: IChartData[] = JSON.parse(response);
+			const storageFind = storageData.find((el) => el?.date === id);
+			if (storageFind === undefined) return;
+			setSleepData([storageFind]);
+			console.log(
+				'chat의 storageData: ',
+				storageData.find((el) => el?.date === id)
+			);
+		}
+	}, []);
+
+	// input의 disabled 설정
+	useEffect(() => {
+		if (`${date.getFullYear()}${date.getMonth() + 1}` === id) {
+			setIsinputDisable(false);
+		} else {
+			setIsinputDisable(true);
+		}
+	}, []);
 
 	// 일어난 시간 설정
 	const onValid = ({ sleepInput }: ISubmitProps) => {
@@ -42,18 +102,19 @@ function SleepChart() {
 		}
 		const numberTimeSplit = stringTimeSplit[0] + stringTimeSplit[1] * oneMinute;
 		let newData: string[];
-		let isToday = dateArr.findIndex((el) => el === todayDate - 1); // 일어난 날짜가 28일이면 27일에 잠을 자고 일어난 것이니까 하루 뺐음
+		let isToday = sleepData[0].sleepDateTrack.findIndex(
+			(el) => el === todayDate - 1
+		); // 일어난 날짜가 28일이면 27일에 잠을 자고 일어난 것이니까 하루 뺐음
 
 		// date가 빈 배열일 때는 isToday = 0일 필요가 없음 ->
 		if (todayDate - 1 === 0) {
 			// 새로운 달 이니까 배열의 첫 번째로 이전 달의 마지막 날짜가 들어가야 한다. -> 0번째 index에 이전 달의 마지막 날짜를 넣으면 됨
-			if (dateArr.length === 1) {
+			if (sleepData[0].sleepDateTrack.length === 1) {
 				isToday = 0;
 			}
 		}
 
-		const copyTime = [...sleepTime];
-		let copyDateArr;
+		const copyTime = [...sleepData[0].sleepTimeTrack];
 
 		if (isToday === -1) {
 			if (todayDate - 1 === 0) {
@@ -63,51 +124,57 @@ function SleepChart() {
 					date.getMonth(),
 					0
 				).getDate();
-				setDateArr((oldArr) => {
-					copyDateArr = [...oldArr, prevMonthLastDate];
-					return copyDateArr;
-				});
+				const newTimeTrack = [...copyTime, numberTimeSplit + ''];
+				const copyDateArr = [
+					...sleepData[0]?.sleepDateTrack,
+					prevMonthLastDate,
+				];
+				let newData2: IChartData = {
+					...sleepData[0],
+					sleepDateTrack: copyDateArr,
+					sleepTimeTrack: newTimeTrack,
+				};
+				setSleepData([newData2]);
 			} else {
-				setDateArr((oldArr) => {
-					copyDateArr = [...oldArr, todayDate - 1];
-					return copyDateArr;
-				});
+				const newTimeTrack = [...copyTime, numberTimeSplit + ''];
+				const copyDateArr = [...sleepData[0]?.sleepDateTrack, todayDate - 1];
+				let newData2: IChartData = {
+					...sleepData[0],
+					sleepDateTrack: copyDateArr,
+					sleepTimeTrack: newTimeTrack,
+				};
+				setSleepData([newData2]);
 			}
-			newData = [...copyTime, numberTimeSplit + ''];
-			setSleepTime(newData);
+			// newData = [...copyTime, numberTimeSplit + ''];
+			// setSleepTime(newData);
 		} else {
-			copyDateArr = [...dateArr]; // 계속 copyDateArr가 없다고 뜨거나 isToday가 -1일 때만 줘서 이상하게 동작했음
 			copyTime[isToday] = numberTimeSplit + ''; // 1일에는 이전 달의 마지막 날짜가 추가되어서 수정하려고 할 때 isToady가 계속 현재 날짜 1일이 없다고 나와서 계속 데이터 추가됨
-			newData = copyTime;
-			setSleepTime(copyTime);
+			setSleepData([{ ...sleepData[0], sleepTimeTrack: copyTime }]);
 		}
 		setValue('sleepInput', '');
-		localStorage.setItem('sleepTimeTrack', JSON.stringify(newData));
-		localStorage.setItem('sleepDateTrack', JSON.stringify(copyDateArr));
 	};
-
-	useEffect(() => {
-		const storageTimeTrack = localStorage.getItem('sleepTimeTrack');
-		const storageDateTrack = localStorage.getItem('sleepDateTrack');
-		if (!storageTimeTrack || !storageDateTrack) return;
-		setSleepTime(JSON.parse(storageTimeTrack));
-		setDateArr(JSON.parse(storageDateTrack));
-	}, []);
 
 	const deleteToday = () => {
 		/* useState의 배열에 오늘 날짜(26)일이 없으면 삭제 못 함 당일만 삭제/수정 가능 */
-		const isToday = dateArr.findIndex((el) => el === todayDate - 1);
+		const isToday = sleepData[0].sleepDateTrack.findIndex(
+			(el) => el === todayDate - 1
+		);
 		if (isToday === -1) {
 			alert('이전의 시간은 삭제할 수 없습니다.');
 		} else {
-			const copySleepTime = [...sleepTime];
-			const copyDateArr = [...dateArr];
+			const copySleepTime = [...sleepData[0].sleepTimeTrack];
+			const copyDateArr = [...sleepData[0].sleepDateTrack];
 			copySleepTime.splice(isToday, 1);
 			copyDateArr.splice(isToday, 1);
-			setSleepTime(copySleepTime);
-			setDateArr(copyDateArr);
-			localStorage.setItem('sleepTimeTrack', JSON.stringify(copySleepTime));
-			localStorage.setItem('sleepDateTrack', JSON.stringify(copyDateArr));
+			setSleepData((old) => {
+				return [
+					{
+						...old[0],
+						sleepDateTrack: copyDateArr,
+						sleepTimeTrack: copySleepTime,
+					},
+				];
+			});
 			// 00:00 ~ 06:00
 		}
 	};
@@ -124,7 +191,7 @@ function SleepChart() {
 		<>
 			<Title>
 				취침 시간 그래프
-				{`(${date.getFullYear() + ' - ' + (date.getMonth() + 1)})`}
+				{`(${id?.substring(0, 4)}-${id?.substring(4)})`}
 			</Title>
 			<Container>
 				<FormWrapper>
@@ -137,15 +204,22 @@ function SleepChart() {
 							id="sleep"
 							min="19:00"
 							max="06:00"
+							disabled={isinputDisable}
 						/>
-						<button>제출</button>
+						<button disabled={isinputDisable}>제출</button>
 					</form>
-					<DeleteButton onClick={deleteToday} type="button">
+					<DeleteButton
+						onClick={deleteToday}
+						type="button"
+						disabled={isinputDisable}
+					>
 						오늘 취침 시간 삭제하기
 					</DeleteButton>
 					<div>
 						평균 취침 시간:{' '}
-						{sleepTime.length ? sleepAverageTime(sleepTime) : 'x'}
+						{sleepData[0]?.sleepTimeTrack.length
+							? sleepAverageTime(sleepData[0]?.sleepTimeTrack)
+							: 'x'}
 					</div>
 				</FormWrapper>
 				<ChartWrapper>
@@ -154,7 +228,7 @@ function SleepChart() {
 						series={[
 							{
 								name: '취침 시간',
-								data: sleepTime,
+								data: sleepData[0]?.sleepTimeTrack,
 							},
 						]}
 						options={{
@@ -222,9 +296,9 @@ function SleepChart() {
 								size: 1,
 							},
 							xaxis: {
-								categories: dateArr,
+								categories: sleepData[0]?.sleepDateTrack,
 								title: {
-									text: '2021 - 11',
+									text: `${id?.substring(0, 4)}-${id?.substring(4)}`,
 									style: {
 										color: chartTextColor(isDark),
 									},
