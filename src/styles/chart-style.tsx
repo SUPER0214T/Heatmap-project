@@ -8,35 +8,44 @@ export const Title = styled.div`
 `;
 
 export const ChartWrapper = styled.div`
-	min-width: 600px;
-	max-width: 1200px;
-	margin: 0 auto;
+	/* flex: 1; */
+	/* min-width: 600px; */
+	/* max-width: 1200px; */
+	/* margin: 0 auto; */
+	/* border: 1px solid #eee; */
+	/* border-radius: 10px; */
+	/* box-shadow: 1px 1px #eee; */
+	/* align-self: center; */
+
+	.wrp {
+		/* min-width: 600px;
+		max-width: 1200px; */
+		border: 1px solid #dae1e6;
+		border-radius: 10px;
+		padding: 10px;
+		margin: 0 auto;
+		box-shadow: rgb(0 0 0 / 4%) 0px 2px 10px 0px;
+	}
 `;
 
 export const FormWrapper = styled.div`
+	height: 100%;
 	min-width: 200px;
+	border-right: 1px solid ${(props) => props.theme.textColor}; //#dadde1 #606770
+	overflow-y: scroll;
 `;
 
 export const Container = styled.div`
 	display: flex;
+	min-width: 600px;
+	max-width: 1200px;
+	margin: 0 auto;
+	text-align: center;
+	flex-direction: column;
+	overflow-y: scroll;
 
-	${FormWrapper} {
-		display: flex;
-		flex-direction: column;
-		flex-shrink: 0;
-
-		form {
-			display: flex;
-			flex-direction: column;
-
-			label {
-				margin-bottom: 10px;
-			}
-
-			button {
-				margin-bottom: 10px;
-			}
-		}
+	&::-webkit-scrollbar {
+		display: none;
 	}
 
 	${ChartWrapper} {
@@ -51,6 +60,13 @@ export const DeleteButton = styled.button`
 	font-weight: bold;
 	border-radius: 5px;
 	padding: 5px;
+	width: 100%;
+	margin-bottom: 8px;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 `;
 
 export function averageTime(timeArray: string[]) {
