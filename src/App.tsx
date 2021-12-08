@@ -1,13 +1,12 @@
-import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
-import { chartData, IChartData, themeState } from './atoms';
-import Chart from './components/Chart';
-import SleepChart from './components/SleepChart';
+import React from 'react';
+import { useRecoilValue } from 'recoil';
+import { createGlobalStyle, ThemeProvider } from 'styled-components';
+import { themeState } from './atoms';
 import { darkTheme, lightTheme } from './theme';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Main from './components/Main';
+import Charts from './components/Charts';
+import Header from './components/Header';
 
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -76,69 +75,17 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-// 버튼이 이상하게 애니메이션 되니까 useState로 보였다 안보였다 + layoutId
-const ToggleButton = styled(motion.div)<{ isToggle: boolean }>`
-	width: 80px;
-	height: 50px;
-	background-color: rgba(0, 0, 0, 0.185);
-	display: flex;
-	justify-content: ${(props) => (props.isToggle ? 'flex-start' : 'flex-end')};
-	border-radius: 25px;
-	padding: 5px;
-	cursor: pointer;
-
-	.handle {
-		width: 40px;
-		height: 40px;
-		background-color: white;
-		border-radius: 20px;
-	}
-`;
-
 function App() {
-	const [isDark, setIsDark] = useRecoilState(themeState);
-	const [chartDB, setChartDB] = useRecoilState<IChartData[]>(chartData);
-	let date = new Date();
-
-	const [isOn, setIsOn] = useState(false);
-	const toggleSwitch = () => {
-		setIsOn(!isOn);
-		setIsDark((prev) => !prev);
-	};
+	const isDark = useRecoilValue(themeState);
 
 	return (
 		<>
 			<ThemeProvider theme={isDark ? darkTheme : lightTheme}>
-				<ToggleButton className="switch" isToggle={isOn} onClick={toggleSwitch}>
-					<motion.div className="handle" />
-				</ToggleButton>
-				<button
-					onClick={() => {
-						setIsDark((prev) => !prev);
-						console.log(chartDB);
-					}}
-				>
-					Theme toggle
-				</button>
 				<GlobalStyle />
-				<Link to="/">메인 페이지/</Link>
-				{chartDB.map((el) => (
-					<Link to={`/${el?.date}`}>
-						{el?.date.substring(0, 4)}년도 {el?.date.substring(4)}월 그래프
-					</Link>
-				))}
+				<Header />
 
 				<Routes>
-					<Route
-						path="/:id"
-						element={
-							<>
-								<Chart />
-								<hr />
-								<SleepChart />
-							</>
-						}
-					/>
+					<Route path="/:id" element={<Charts />} />
 					<Route path="/" element={<Main />} />
 				</Routes>
 			</ThemeProvider>
