@@ -4,7 +4,7 @@ export const Title = styled.div`
 	padding: 10px;
 	font-size: 2rem;
 	font-weight: bold;
-	text-align: center;
+	/* text-align: center; */
 `;
 
 export const ChartWrapper = styled.div`
@@ -20,7 +20,7 @@ export const ChartWrapper = styled.div`
 	.wrp {
 		/* min-width: 600px;
 		max-width: 1200px; */
-		border: 1px solid #dae1e6;
+		border: 1px solid ${(props) => props.theme.borderColor};
 		border-radius: 10px;
 		padding: 10px;
 		margin: 0 auto;
@@ -31,16 +31,15 @@ export const ChartWrapper = styled.div`
 export const FormWrapper = styled.div`
 	height: 100%;
 	min-width: 200px;
-	border-right: 1px solid ${(props) => props.theme.textColor}; //#dadde1 #606770
-	overflow-y: scroll;
+	border-right: 1px solid ${(props) => props.theme.borderColor}; //#dadde1 #606770
 `;
 
 export const Container = styled.div`
+	padding: 15px;
 	display: flex;
 	min-width: 600px;
 	max-width: 1200px;
 	margin: 0 auto;
-	text-align: center;
 	flex-direction: column;
 	overflow-y: scroll;
 

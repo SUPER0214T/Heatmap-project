@@ -6,6 +6,7 @@ export const lightTheme: DefaultTheme = {
 	accentColor: '#9C90E8',
 	buttonColor: '#90cdf4',
 	borderColor: '#dadde1',
+	footerBgColor: '#303846',
 };
 
 export const darkTheme: DefaultTheme = {
@@ -14,4 +15,5 @@ export const darkTheme: DefaultTheme = {
 	accentColor: '#9C90E8',
 	buttonColor: '#90cdf4',
 	borderColor: '#606770',
+	footerBgColor: '#303846',
 };
