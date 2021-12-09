@@ -10,12 +10,12 @@ import {
 	Container,
 	DeleteButton,
 	FormWrapper,
-	Title,
 } from '../styles/chart-style';
 import { useRecoilState } from 'recoil';
-import { chartData, IChartData, isChartAtom, themeState } from '../atoms';
+import { IChartData, isChartAtom, themeState } from '../atoms';
 import { useNavigate, useParams } from 'react-router';
 import { IBtnLink } from './Charts';
+import { motion } from 'framer-motion';
 
 interface ISubmitProps {
 	wakeUpInput: string;
@@ -54,8 +54,8 @@ const PageWrapper = styled.div`
 `;
 
 const BtnLink = styled.div<IBtnLink>`
-	padding: 10px 0;
 	display: flex;
+	margin-bottom: 20px;
 
 	button {
 		background-color: #90cdf4;
@@ -63,15 +63,21 @@ const BtnLink = styled.div<IBtnLink>`
 		width: 100%;
 		height: 50px;
 		opacity: 0.5;
-		transition: opacity 0.25s ease-in-out;
+		transition: opacity 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+		box-shadow: 10px 10px 14px 1px rgb(0 0 0 / 10%);
 
 		&.isWakeup {
-			opacity: ${(props) => (props.isChart ? '1' : '0.5')};
+			opacity: ${(props) => (props.isChart ? '1' : '0.7')};
 			pointer-events: ${(props) => (props.isChart ? 'none' : 'all')};
+			box-shadow: ${(props) =>
+				props.isChart ? 'none' : '10px 10px 14px 1px rgb(0 0 0 / 10%)'};
 		}
 
 		&.isSleep {
-			opacity: ${(props) => (props.isChart ? '0.5' : '1')};
+			opacity: ${(props) => (props.isChart ? '0.7' : '1')};
+			pointer-events: ${(props) => (props.isChart ? 'all' : 'none')};
+			box-shadow: ${(props) =>
+				props.isChart ? '10px 10px 14px 1px rgb(0 0 0 / 10%)' : 'none'};
 		}
 
 		&:first-child {
@@ -80,6 +86,7 @@ const BtnLink = styled.div<IBtnLink>`
 
 		&:hover {
 			opacity: 1;
+			box-shadow: none;
 		}
 	}
 `;
@@ -97,10 +104,8 @@ function Chart() {
 	const { register, handleSubmit, setValue } = useForm();
 	let date = new Date();
 	const todayDate = date.getDate();
-	console.log('테스트 wakeUpData: ', wakeUpData);
 	// 변경사항을 localStorage에 저장하는 함수
 	function sendToLocalStorage() {
-		console.log('wakeUpData', wakeUpData);
 		const response = localStorage.getItem('userWakeUpChartData');
 		if (!response) {
 			console.log('response에 데이터 없음!');
@@ -112,7 +117,6 @@ function Chart() {
 				1,
 				wakeUpData[0]
 			);
-			console.log('기상 시간 변경 함수 실행!');
 			localStorage.setItem('userWakeUpChartData', JSON.stringify(storageData));
 		}
 	}
@@ -186,7 +190,6 @@ function Chart() {
 		} else {
 			// 오늘 날짜가 있으면 날짜를 추가하지 않고 기상 시간만 수정한다.
 			if (isToady === undefined) return;
-			console.log('여기는 일어난 시간 수정하는 곳');
 			copyTime[isToady] = numberTimeSplit + '';
 			setWakeUpData([{ ...wakeUpData[0], wakeUpTimeTrack: copyTime }]);
 		}
@@ -198,7 +201,6 @@ function Chart() {
 		const isToday = wakeUpData[0]?.wakeUpDateTrack.findIndex(
 			(el) => el === todayDate
 		);
-		console.log('isToday: ', isToday);
 		if (isToday === -1) {
 			alert('이전의 시간은 삭제할 수 없습니다.');
 		} else {

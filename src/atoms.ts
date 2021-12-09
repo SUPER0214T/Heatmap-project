@@ -20,3 +20,8 @@ export const chartData = atom<IChartData[]>({
 	key: 'chartData',
 	default: [],
 });
+
+export const isChartAtom = atom<boolean>({
+	key: 'chartData',
+	default: true,
+});
