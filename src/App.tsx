@@ -7,6 +7,8 @@ import { Routes, Route } from 'react-router-dom';
 import Main from './components/Main';
 import Charts from './components/Charts';
 import Header from './components/Header';
+import Footer from './components/Footer';
+import Terms from './components/Terms';
 
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -85,9 +87,11 @@ function App() {
 				<Header />
 
 				<Routes>
+					<Route path="/pages/terms" element={<Terms />} />
 					<Route path="/:id" element={<Charts />} />
 					<Route path="/" element={<Main />} />
 				</Routes>
+				<Footer />
 			</ThemeProvider>
 		</>
 	);
