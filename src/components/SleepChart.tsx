@@ -10,7 +10,6 @@ import {
 	DeleteButton,
 	FormWrapper,
 	sleepAverageTime,
-	Title,
 } from '../styles/chart-style';
 import { useRecoilState } from 'recoil';
 import { IChartData, isChartAtom, themeState } from '../atoms';
@@ -296,135 +295,139 @@ function SleepChart() {
 							취침 시간
 						</button>
 					</BtnLink>
-					<ChartWrapper className="chartWrapper">
-						<div className="wrp">
-							<ApexChart
-								type="line"
-								series={[
-									{
-										name: '취침 시간',
-										data: sleepData[0]?.sleepTimeTrack,
-									},
-								]}
-								options={{
-									chart: {
-										height: 350,
-										type: 'line',
-										dropShadow: {
-											enabled: true,
-											color: '#000',
-											top: 18,
-											left: 7,
-											blur: 10,
-											opacity: 0.2,
+					{sleepData[0]?.wakeUpTimeTrack !== undefined ? (
+						<ChartWrapper className="chartWrapper">
+							<div className="wrp">
+								<ApexChart
+									type="line"
+									series={[
+										{
+											name: '취침 시간',
+											data: sleepData[0]?.sleepTimeTrack,
 										},
-										toolbar: {
-											show: false,
-										},
-									},
-									colors: [isDark ? '#9C90E8' : '#4CC9FF'], // 그래프 색 바꾸는 곳
-									dataLabels: {
-										enabled: false,
-										offsetX: -10,
-										offsetY: -5,
-										formatter: (value) => {
-											return timeConverter(value as number);
-										},
-										background: {
-											foreColor: 'white', // dataLabel의 text 색상
-											borderWidth: 0,
+									]}
+									options={{
+										chart: {
+											height: 350,
+											type: 'line',
 											dropShadow: {
-												enabled: false,
+												enabled: true,
+												color: '#000',
+												top: 18,
+												left: 7,
+												blur: 10,
+												opacity: 0.2,
 											},
-										},
-									},
-									stroke: {
-										curve: 'smooth',
-									},
-									title: {
-										text: '취침 시간',
-										align: 'center',
-										style: {
-											fontSize: '30px',
-											color: chartTextColor(isDark),
-										},
-									},
-									grid: {
-										show: true,
-										borderColor: chartGridColor(isDark),
-										row: {
-											colors: ['transparent', 'transparent'],
-											opacity: 0.5,
-										},
-										xaxis: {
-											lines: {
-												show: true,
-											},
-										},
-										yaxis: {
-											lines: {
+											toolbar: {
 												show: false,
 											},
 										},
-									},
-									markers: {
-										size: 1,
-									},
-									xaxis: {
-										categories: sleepData[0]?.sleepDateTrack,
+										colors: [isDark ? '#9C90E8' : '#4CC9FF'], // 그래프 색 바꾸는 곳
+										dataLabels: {
+											enabled: false,
+											offsetX: -10,
+											offsetY: -5,
+											formatter: (value) => {
+												return timeConverter(value as number);
+											},
+											background: {
+												foreColor: 'white', // dataLabel의 text 색상
+												borderWidth: 0,
+												dropShadow: {
+													enabled: false,
+												},
+											},
+										},
+										stroke: {
+											curve: 'smooth',
+										},
 										title: {
-											text: `${id?.substring(0, 4)}-${id?.substring(4)}`,
+											text: '취침 시간',
+											align: 'center',
 											style: {
+												fontSize: '30px',
 												color: chartTextColor(isDark),
 											},
 										},
-										labels: {
-											style: {
-												colors: chartTextColor(isDark),
-											},
-										},
-										axisBorder: {
+										grid: {
 											show: true,
-											color: chartGridColor(isDark),
-										},
-										axisTicks: {
-											show: true,
-											color: chartGridColor(isDark),
-										},
-									},
-									yaxis: {
-										tickAmount: 11,
-										min: 19,
-										max: 30,
-										labels: {
-											formatter: (value) => {
-												return timeConverter(value);
+											borderColor: chartGridColor(isDark),
+											row: {
+												colors: ['transparent', 'transparent'],
+												opacity: 0.5,
 											},
-											style: {
-												fontSize: '12px',
-												colors: chartTextColor(isDark),
+											xaxis: {
+												lines: {
+													show: true,
+												},
+											},
+											yaxis: {
+												lines: {
+													show: false,
+												},
 											},
 										},
-									},
-									legend: {
-										position: 'top',
-										horizontalAlign: 'right',
-										floating: true,
-										offsetY: -25,
-										offsetX: -5,
-									},
-									tooltip: {
-										theme: isDark ? 'dark' : 'light',
-										y: {
-											formatter: (value) => {
-												return timeConverter(value);
+										markers: {
+											size: 1,
+										},
+										xaxis: {
+											categories: sleepData[0]?.sleepDateTrack,
+											title: {
+												text: `${id?.substring(0, 4)}-${id?.substring(4)}`,
+												style: {
+													color: chartTextColor(isDark),
+												},
+											},
+											labels: {
+												style: {
+													colors: chartTextColor(isDark),
+												},
+											},
+											axisBorder: {
+												show: true,
+												color: chartGridColor(isDark),
+											},
+											axisTicks: {
+												show: true,
+												color: chartGridColor(isDark),
 											},
 										},
-									},
-								}}
-							/>
-						</div>
-					</ChartWrapper>
+										yaxis: {
+											tickAmount: 11,
+											min: 19,
+											max: 30,
+											labels: {
+												formatter: (value) => {
+													return timeConverter(value);
+												},
+												style: {
+													fontSize: '12px',
+													colors: chartTextColor(isDark),
+												},
+											},
+										},
+										legend: {
+											position: 'top',
+											horizontalAlign: 'right',
+											floating: true,
+											offsetY: -25,
+											offsetX: -5,
+										},
+										tooltip: {
+											theme: isDark ? 'dark' : 'light',
+											y: {
+												formatter: (value) => {
+													return timeConverter(value);
+												},
+											},
+										},
+									}}
+								/>
+							</div>
+						</ChartWrapper>
+					) : (
+						<>Loading...</>
+					)}
 				</Container>
 			</PageWrapper>
 		</>
