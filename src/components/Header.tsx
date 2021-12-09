@@ -1,11 +1,15 @@
-import { motion } from 'framer-motion';
+import { motion, useViewportScroll } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { IChartData, themeState } from '../atoms';
 
-const HeaderSection = styled.header`
+type HeaderProps = {
+	isScroll: boolean;
+};
+
+const HeaderSection = styled.header<HeaderProps>`
 	padding: 8px;
 	position: fixed;
 	top: 0;
@@ -17,8 +21,12 @@ const HeaderSection = styled.header`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	/* border-bottom: 1px solid ${(props) => props.theme.borderColor}; */
-	box-shadow: 0px 2px 4px rgb(0 0 0 / 10%);
+	transition: box-shadow 0.2s ease-in-out;
+	opacity: 0.97;
+	border-bottom: ${(props) =>
+		props.isScroll ? 'none' : `1px solid ${props.theme.borderColor}`};
+	box-shadow: ${(props) =>
+		props.isScroll ? '0px 2px 4px rgb(0 0 0 / 10%)' : 'none'};
 `;
 
 const ToggleButton = styled(motion.div)<{ isToggle: boolean }>`
@@ -41,7 +49,13 @@ const ToggleButton = styled(motion.div)<{ isToggle: boolean }>`
 `;
 
 function Header() {
+	const { scrollYProgress } = useViewportScroll();
 	const [isDark, setIsDark] = useRecoilState(themeState);
+	const [isScroll, setIsScroll] = useState<boolean>(false);
+
+	scrollYProgress.onChange(() =>
+		scrollYProgress.get() === 0 ? setIsScroll(false) : setIsScroll(true)
+	);
 
 	const [isOn, setIsOn] = useState(false);
 	const toggleSwitch = () => {
@@ -94,7 +108,7 @@ function Header() {
 
 	return (
 		<>
-			<HeaderSection>
+			<HeaderSection isScroll={isScroll}>
 				<Link to="/">메인 페이지</Link>
 				{chartDB.map((el, index) => (
 					<Link key={index} to={`/${el?.date}`}>
