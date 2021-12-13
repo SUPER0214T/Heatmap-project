@@ -86,10 +86,8 @@ function SleepChart() {
 
 	// 변경사항을 localStorage에 저장하는 함수
 	function sendToLocalStorage() {
-		console.log('sleepData', sleepData);
 		const response = localStorage.getItem('userWakeUpChartData');
 		if (!response) {
-			console.log('response에 데이터 없음!');
 			return;
 		} else {
 			const storageData: IChartData[] = JSON.parse(response);
@@ -98,7 +96,6 @@ function SleepChart() {
 				1,
 				sleepData[0]
 			);
-			console.log('기상 시간 변경 함수 실행!');
 			localStorage.setItem('userWakeUpChartData', JSON.stringify(storageData));
 		}
 	}
@@ -122,10 +119,6 @@ function SleepChart() {
 			const storageFind = storageData.find((el) => el?.date === id);
 			if (storageFind === undefined) return;
 			setSleepData([storageFind]);
-			console.log(
-				'chat의 storageData: ',
-				storageData.find((el) => el?.date === id)
-			);
 		}
 	}, []);
 

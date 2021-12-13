@@ -86,7 +86,6 @@ function Chart() {
 	function sendToLocalStorage() {
 		const response = localStorage.getItem('userWakeUpChartData');
 		if (!response) {
-			console.log('response에 데이터 없음!');
 			return;
 		} else {
 			const storageData: IChartData[] = JSON.parse(response);
@@ -118,10 +117,6 @@ function Chart() {
 			const storageFind = storageData.find((el) => el?.date === id);
 			if (storageFind === undefined) return;
 			setWakeUpData([storageFind]);
-			console.log(
-				'chat의 storageData: ',
-				storageData.find((el) => el?.date === id)
-			);
 		}
 	}, []);
 

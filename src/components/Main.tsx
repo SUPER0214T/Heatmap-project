@@ -1,11 +1,20 @@
-import { motion } from 'framer-motion';
-import React, { useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { chartData, IChartData } from '../atoms';
+import { IChartData } from '../atoms';
+
+const MainWrapper = styled.div`
+	padding-top: 60px;
+	height: 100vh;
+`;
+
+const leftAside = styled.aside``;
+
+const MainSection = styled.main``;
 
 function Main() {
-	const [chartDB, setChartDB] = useRecoilState<IChartData[]>(chartData);
+	// const [chartDB, setChartDB] = useRecoilState<IChartData[]>(chartData);
+	const [chartDB, setChartDB] = useState<IChartData[]>([]);
 	let date = new Date();
 	const currentDate = `${date.getFullYear()}${
 		date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
@@ -34,7 +43,6 @@ function Main() {
 
 			if (isCurrent !== -1) {
 				setChartDB(storageData);
-				console.log('여기는 App의 isCurrent');
 			} else {
 				// 11월 -> 12월로 바뀌면 새로운 date: Year&Month 를 추가
 				let newDB;
@@ -49,7 +57,19 @@ function Main() {
 
 	return (
 		<>
-			<div style={{ background: 'red', color: 'white' }}>여기는 main</div>
+			<MainWrapper>
+				<nav>
+					<ul>
+						{chartDB.map((el, index) => (
+							<li key={index}>
+								<Link to={`/${el.date}`}>
+									{el?.date.substring(0, 4)}-{el?.date.substring(4)}월
+								</Link>
+							</li>
+						))}
+					</ul>
+				</nav>
+			</MainWrapper>
 		</>
 	);
 }

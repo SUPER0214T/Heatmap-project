@@ -93,7 +93,6 @@ function Header() {
 
 			if (isCurrent !== -1) {
 				setChartDB(storageData);
-				console.log('여기는 App의 isCurrent');
 			} else {
 				// 11월 -> 12월로 바뀌면 새로운 date: Year&Month 를 추가
 				let newDB;
