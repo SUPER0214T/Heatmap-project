@@ -15,7 +15,6 @@ import { useRecoilState } from 'recoil';
 import { IChartData, isChartAtom, themeState } from '../atoms';
 import { useNavigate, useParams } from 'react-router';
 import { IBtnLink } from './Charts';
-import { motion } from 'framer-motion';
 
 interface ISubmitProps {
 	wakeUpInput: string;
@@ -25,27 +24,6 @@ const PageWrapper = styled.div`
 	display: flex;
 	height: 100vh;
 	padding-top: 60px;
-	${FormWrapper} {
-		padding: 8px;
-		min-width: 232px;
-		max-width: 300px;
-		flex-grow: 1;
-		flex-shrink: 1;
-
-		form {
-			display: flex;
-			flex-direction: column;
-			width: 100%;
-
-			label {
-				margin-bottom: 10px;
-			}
-
-			button {
-				margin-bottom: 10px;
-			}
-		}
-	}
 
 	${Container} {
 		flex: 1;
@@ -234,16 +212,19 @@ function Chart() {
 				<FormWrapper>
 					<form onSubmit={handleSubmit(onValid)}>
 						<label htmlFor="wakeUp">시간 입력 (02:00 ~ 13:00)</label>
-						<input
-							{...register('wakeUpInput', { required: true })}
-							autoComplete="off"
-							type="time"
-							id="wakeUp"
-							min="02:00"
-							max="13:00"
-							disabled={isinputDisable}
-						/>
-						<button disabled={isinputDisable}>시간 입력/수정</button>
+						<div className="inputSection">
+							<input
+								{...register('wakeUpInput', { required: true })}
+								className="time-input"
+								autoComplete="off"
+								type="time"
+								id="wakeUp"
+								min="02:00"
+								max="13:00"
+								disabled={isinputDisable}
+							/>
+							<button disabled={isinputDisable}>입력/수정</button>
+						</div>
 					</form>
 					<DeleteButton
 						onClick={deleteToday}

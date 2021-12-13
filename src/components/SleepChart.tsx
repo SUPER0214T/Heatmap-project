@@ -24,27 +24,6 @@ const PageWrapper = styled.div`
 	display: flex;
 	height: 100vh;
 	padding-top: 60px;
-	${FormWrapper} {
-		padding: 8px;
-		min-width: 232px;
-		max-width: 300px;
-		flex-grow: 1;
-		flex-shrink: 1;
-
-		form {
-			display: flex;
-			flex-direction: column;
-			width: 100%;
-
-			label {
-				margin-bottom: 10px;
-			}
-
-			button {
-				margin-bottom: 10px;
-			}
-		}
-	}
 
 	${Container} {
 		flex: 1;
@@ -261,16 +240,19 @@ function SleepChart() {
 				<FormWrapper>
 					<form onSubmit={handleSubmit(onValid)}>
 						<label htmlFor="sleep">시간 입력 (19:00 ~ 06:00)</label>
-						<input
-							{...register('sleepInput', { required: true })}
-							autoComplete="off"
-							type="time"
-							id="sleep"
-							min="19:00"
-							max="06:00"
-							disabled={isinputDisable}
-						/>
-						<button disabled={isinputDisable}>시간 입력/수정</button>
+						<div className="inputSection">
+							<input
+								{...register('sleepInput', { required: true })}
+								className="time-input"
+								autoComplete="off"
+								type="time"
+								id="sleep"
+								min="19:00"
+								max="06:00"
+								disabled={isinputDisable}
+							/>
+							<button disabled={isinputDisable}>입력/수정</button>
+						</div>
 					</form>
 					<DeleteButton
 						onClick={deleteToday}
