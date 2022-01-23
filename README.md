@@ -1,46 +1,49 @@
-# Getting Started with Create React App
+# 기상시간/취침시간 기록 그래프
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## [해당 프로젝트 주소](https://superpet21.github.io/ChartTrack/#/)
 
-## Available Scripts
+## 목적과 동기
 
-In the project directory, you can run:
+### 목적
 
-### `npm start`
+- 기상 시간과 취침 시간을 기록하여 자신의 생활 패턴을 확인할 수 있도록 돕기 위하여 제작하게 되었습니다.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### 동기
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```
+너무 늦게 자거나 늦게 일어나는 습관을 바꾸고 싶었습니다.
 
-### `npm test`
+처음에는 기상 시간과 취침 시간만을 글로 기록했습니다. 기상/취침 시간을 확인할 수는 있었지만 비교하기에 편하지 않았습니다. 그래서 "그래프를 그려보자!"라고 생각하게 되었습니다.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+노트에 직접 그래프를 그려서 기상/취침 시간을 기록하였습니다.
 
-### `npm run build`
+그리고 어제보다 빨리 자고, 빨리 일어나는 그래프를 보니 동기부여가 되었습니다.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+문제는 그래프의 칸을 다 사용하면 그래프를 새로 그려야 한다는 것이었고 그것이 귀찮아서 도중에 기록을 하지 않게 되었습니다.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+"좋은 행동들은 더 하기 쉽게, 나쁜 행동들은 하기 어렵게 만드는 환경을 마련해야 한다"라는 책의 문구가 떠올랐고 그래프를 그리는 것만 해결된다면 계속해서 기록을 하고, 동기부여를 얻을 것이라고 생각했습니다.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+또한, 기록 그래프를 만들면 저에게도 도움이 되지만 다른 이들에게도 도움이 되리라고 생각했기에 제작을 결심하였습니다.
+```
 
-### `npm run eject`
+## 기능
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. 영화 검색하기
+2. 영화 슬라이더 구현
+3. 모바일용 메뉴 tooltip
+4. 영화 슬라이더에 있는 영화 클릭 시 영화 정보 모달이 등장합니다.
+5. 영화 개봉일, 설명, 장르와 미리 보기를 해당 모달에서 확인할 수 있습니다.
+6. 미리 보기 영상이 없는 경우 회차 목록에 "목록이 없습니다."가 표시됩니다.
+7. 영화 목록에서 영화를 클릭 시 해당 영상의 미리 보기 영상이 열립니다.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 사용한 React 라이브러리
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- [React Query](https://react-query.tanstack.com/)
+- [Recoil](https://recoiljs.org/ko/)
+- [styled components](https://styled-components.com/)
+- [Framer Motion](https://www.framer.com/motion/)
+- [React Helmet Async](https://github.com/staylor/react-helmet-async)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## 제작 기간
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+> 22.01.16 ~ 22.01.23
