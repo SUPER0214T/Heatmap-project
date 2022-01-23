@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/Heatmap-project/static/js/main.307b063c.chunk.js",
-    "main.js.map": "/Heatmap-project/static/js/main.307b063c.chunk.js.map",
+    "main.js": "/Heatmap-project/static/js/main.0ea99ae5.chunk.js",
+    "main.js.map": "/Heatmap-project/static/js/main.0ea99ae5.chunk.js.map",
     "runtime-main.js": "/Heatmap-project/static/js/runtime-main.c7187e22.js",
     "runtime-main.js.map": "/Heatmap-project/static/js/runtime-main.c7187e22.js.map",
     "static/js/2.0620c358.chunk.js": "/Heatmap-project/static/js/2.0620c358.chunk.js",
@@ -12,6 +12,6 @@
   "entrypoints": [
     "static/js/runtime-main.c7187e22.js",
     "static/js/2.0620c358.chunk.js",
-    "static/js/main.307b063c.chunk.js"
+    "static/js/main.0ea99ae5.chunk.js"
   ]
 }
