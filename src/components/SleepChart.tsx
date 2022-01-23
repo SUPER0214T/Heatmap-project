@@ -124,7 +124,13 @@ function SleepChart() {
 
 	// input의 disabled 설정
 	useEffect(() => {
-		if (`${date.getFullYear()}${date.getMonth() + 1}` === id) {
+		if (
+			`${date.getFullYear()}${
+				date.getMonth() + 1 < 10
+					? `0${date.getMonth() + 1}`
+					: date.getMonth() + 1
+			}` === id
+		) {
 			setIsinputDisable(false);
 		} else {
 			setIsinputDisable(true);
