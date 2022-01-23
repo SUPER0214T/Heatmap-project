@@ -1,6 +1,6 @@
 # 기상시간/취침시간 기록 그래프
 
-## [해당 프로젝트 주소](https://superpet21.github.io/ChartTrack/#/)
+## [해당 프로젝트 주소](https://superpet21.github.io/Heatmap-project/#/)
 
 ## 목적과 동기
 
@@ -26,24 +26,10 @@
 또한, 기록 그래프를 만들면 저에게도 도움이 되지만 다른 이들에게도 도움이 되리라고 생각했기에 제작을 결심하였습니다.
 ```
 
-## 기능
+## 사용방법
 
-1. 영화 검색하기
-2. 영화 슬라이더 구현
-3. 모바일용 메뉴 tooltip
-4. 영화 슬라이더에 있는 영화 클릭 시 영화 정보 모달이 등장합니다.
-5. 영화 개봉일, 설명, 장르와 미리 보기를 해당 모달에서 확인할 수 있습니다.
-6. 미리 보기 영상이 없는 경우 회차 목록에 "목록이 없습니다."가 표시됩니다.
-7. 영화 목록에서 영화를 클릭 시 해당 영상의 미리 보기 영상이 열립니다.
-
-## 사용한 React 라이브러리
-
-- [React Query](https://react-query.tanstack.com/)
-- [Recoil](https://recoiljs.org/ko/)
-- [styled components](https://styled-components.com/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [React Helmet Async](https://github.com/staylor/react-helmet-async)
-
-## 제작 기간
-
-> 22.01.16 ~ 22.01.23
+1. 시간을 입력하신 후 시간 입력/수정 버튼을 눌렀을 때 최초 입력 시에는 추가가 되고 최초가 아니라면 수정이 됩니다.
+2. 당일에는 기상/취침 시간을 삭제 또는 수정할 수 있습니다.
+3. 평균 기상 시간은 한 달을 평균으로 계산한 것이고, 매일 입력한 값에 따라 평균 시간이 계산됩니다.
+4. 매월 1일에 해당 월의 그래프가 새로 생성됩니다.
+5. 매월 1일이 되면 이전 달의 그래프에 데이터를 추가/변경할 수 없습니다.
